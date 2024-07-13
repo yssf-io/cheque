@@ -23,8 +23,15 @@ export default function TabOneScreen() {
         await axios.get(`http://localhost:3000/signCheque/${userId}/${amount}`)
       ).data;
       console.log({ signature });
-      // TODO: should point to a URL containing the sig
-      setSig(signature);
+
+      const obj = {
+        to: "0x", // TODO: put the contract address once done
+        signature,
+        amount,
+      };
+      const encoded = btoa(JSON.stringify(obj, null, 2));
+      console.log({ encoded });
+      setSig(encoded); // should become a link to webapp
       setLoading(false);
     } catch (error) {
       console.log("error");
