@@ -66,9 +66,10 @@ app.get("/createWalletSet/:name", async (req, res) => {
   });
 });
 
-app.get("/generateWallet", async (req, res) => {
-  // TODO: store user identifier with its newly generated wallet
+app.get("/generateWallet/:userId", async (req, res) => {
   console.log("generating wallet...");
+  const userId = req.params.userId;
+
   const wallet = await axios.post(
     `${CIRCLE_KEY}/developer/wallets`,
     {
@@ -76,7 +77,7 @@ app.get("/generateWallet", async (req, res) => {
       entitySecretCipherText: getCipherText(),
       blockchains: ["ETH-SEPOLIA"],
       count: 1,
-      walletSetId: "0190ab49-56d6-7c26-829c-be54ccccbfe7",
+      walletSetId: "0190ab49-56d6-7c26-829c-be54ccccbfe7", // we could use the id stored in redis, but we're just gonna use this one for the mvp
     },
     {
       headers: {
@@ -85,9 +86,19 @@ app.get("/generateWallet", async (req, res) => {
     },
   );
 
-  console.log(wallet.data);
+  const { id, walletSetId, address, blockchain, accountType } =
+    wallet.data.data.wallets[0];
+  const walletMeta = { id, walletSetId, address, blockchain, accountType };
+
+  const client = new Redis(
+    `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
+  );
+  await client.set(userId, JSON.stringify(walletMeta, null, 2));
+  client.disconnect();
+
   res.json({
-    message: "wallet created (hopefully)",
+    message: "wallet created",
+    ...walletMeta,
   });
 });
 
