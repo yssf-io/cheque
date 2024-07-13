@@ -2,17 +2,19 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import {Cheque} from "../src/Cheque.sol";
 
-contract CounterScript is Script {
-    Counter public counter;
+contract ChequeScript is Script {
+    Cheque public cheque;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new Counter();
+        address SEPOLIA_USDC = 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238;
+
+        cheque = new Cheque(SEPOLIA_USDC);
 
         vm.stopBroadcast();
     }

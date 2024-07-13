@@ -21,14 +21,14 @@ transfers the money, he just needs the signature.
   - Balance
   - Bonus: onramp
 - Claiming Webapp
-  - Decode URL to display the _Cheque_
+  - ~~Decode URL to display the _Cheque_~~
   - Copy signature button (for tech-savvy users wanting to construct their own transaction)
-  - Connect Wallet mobile (?)
-  - Claim button if connect wallet mobile works
+  - ~~Connect Wallet mobile~~
+  - ~~Claim button if connect wallet mobile works~~
   - Alternatively, ask the claimer to open the URL on desktop
 - Smart Contract
-  - `lockUSDC`
-  - `claimUSDC`
+  - ~~`lockUSDC`~~
+  - ~~`claimUSDC`~~
   - `refund`
 
 Foundry consists of:
