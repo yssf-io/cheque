@@ -1,0 +1,87 @@
+const crypto = require("crypto");
+const express = require("express");
+const axios = require("axios");
+const forge = require("node-forge");
+const { v4: uuidv4 } = require("uuid");
+require("dotenv").config();
+
+const app = express();
+const port = 3000;
+
+const CIRCLE_KEY = "https://api.circle.com/v1/w3s";
+
+const getCipherText = () => {
+  const secret = process.env.SECRET;
+
+  const entitySecret = forge.util.hexToBytes(secret);
+
+  const publicKeyCircle = process.env.PUBLIC_KEY;
+
+  const publicKey = forge.pki.publicKeyFromPem(publicKeyCircle);
+
+  const encryptedData = publicKey.encrypt(entitySecret, "RSA-OAEP", {
+    md: forge.md.sha256.create(),
+    mgf1: { md: forge.md.sha256.create() },
+  });
+
+  return forge.util.encode64(encryptedData);
+};
+
+app.get("/", async (req, res) => {
+  res.json({
+    message: "hello, nothing to see here...",
+  });
+});
+
+app.get("/createWalletSet", async (req, res) => {
+  console.log("creating a wallet set...");
+
+  const walletSet = await axios.post(
+    `${CIRCLE_KEY}/developer/walletSets`,
+    {
+      idempotencyKey: uuidv4(),
+      entitySecretCipherText: getCipherText(),
+      name: "testwallets",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+      },
+    },
+  );
+
+  console.log(walletSet.data);
+  // TODO: store wallet set id somewhere
+  res.json({
+    message: "walletset",
+  });
+});
+
+app.get("/generateWallet", async (req, res) => {
+  // TODO: store user identifier with its newly generated wallet
+  console.log("generating wallet...");
+  const wallet = await axios.post(
+    `${CIRCLE_KEY}/developer/wallets`,
+    {
+      idempotencyKey: uuidv4(),
+      entitySecretCipherText: getCipherText(),
+      blockchains: ["ETH-SEPOLIA"],
+      count: 1,
+      walletSetId: "0190ab49-56d6-7c26-829c-be54ccccbfe7",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+      },
+    },
+  );
+
+  console.log(wallet.data);
+  res.json({
+    message: "wallet created (hopefully)",
+  });
+});
+
+app.listen(port, () => {
+  console.log(`app listening on port ${port}`);
+});
