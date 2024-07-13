@@ -4,13 +4,38 @@ const axios = require("axios");
 const forge = require("node-forge");
 const { v4: uuidv4 } = require("uuid");
 const Redis = require("ioredis");
-const { parseUnits } = require("viem");
+const {
+  parseUnits,
+  encodeFunctionData,
+  parseAbi,
+  maxUint256,
+} = require("viem");
 require("dotenv").config();
 
 const app = express();
 const port = 3000;
 
 const CIRCLE_KEY = "https://api.circle.com/v1/w3s";
+
+const getChequeContract = (chain) => {
+  switch (chain) {
+    case "sepolia":
+      return "0xb698239c12CFeB3478979Dbd3a84eAB34D65dE35";
+
+    default:
+      return "0xb698239c12CFeB3478979Dbd3a84eAB34D65dE35";
+  }
+};
+
+const getUSDCContract = (chain) => {
+  switch (chain) {
+    case "sepolia":
+      return "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+
+    default:
+      return "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+  }
+};
 
 const getCipherText = () => {
   const secret = process.env.SECRET;
@@ -79,6 +104,7 @@ app.get("/generateWallet/:userId", async (req, res) => {
       blockchains: ["ETH-SEPOLIA"],
       count: 1,
       walletSetId: "0190ab49-56d6-7c26-829c-be54ccccbfe7", // we could use the id stored in redis, but we're just gonna use this one for the mvp
+      // accountType: "SCA",
     },
     {
       headers: {
@@ -134,6 +160,138 @@ app.get("/signCheque/:userId/:amount", async (req, res) => {
   res.json({
     message,
     signature: signature.data.data.signature,
+  });
+});
+
+app.get("/lockUSDC/:userId/:amount", async (req, res) => {
+  console.log("signing cheque...");
+  const userId = req.params.userId;
+  const amount = parseUnits(req.params.amount, 6);
+
+  const client = new Redis(
+    `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
+  );
+  const walletMeta = JSON.parse(await client.get(userId));
+  client.disconnect();
+
+  const callData = encodeFunctionData({
+    abi: parseAbi(["function lockUSDC(uint256 amount) external"]),
+    functionName: "lockUSDC",
+    args: [amount],
+  });
+
+  // const estimate = await axios.post(
+  //   `${CIRCLE_KEY}/transactions/contractExecution/estimateFee`,
+  //   {
+  //     contractAddress: getChequeContract("sepolia"),
+  //     callData,
+  //     walletId: walletMeta.id,
+  //   },
+  //   {
+  //     headers: {
+  //       Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+  //     },
+  //   },
+  // );
+  // console.log(estimate.data);
+
+  const ret = await axios.post(
+    `${CIRCLE_KEY}/developer/transactions/contractExecution`,
+    {
+      idempotencyKey: uuidv4(),
+      entitySecretCipherText: getCipherText(),
+      contractAddress: getChequeContract("sepolia"),
+      callData,
+      walletId: walletMeta.id,
+      feeLevel: "HIGH",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+      },
+    },
+  );
+
+  console.log(ret.data);
+
+  res.json({
+    message: "USDC deposited",
+  });
+});
+
+app.get("/approve/:userId", async (req, res) => {
+  console.log("approve...");
+  const userId = req.params.userId;
+
+  const client = new Redis(
+    `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
+  );
+  const walletMeta = JSON.parse(await client.get(userId));
+  client.disconnect();
+
+  const callData = encodeFunctionData({
+    abi: parseAbi([
+      "function approve(address spender, uint256 amount) external",
+    ]),
+    functionName: "approve",
+    args: [getChequeContract("sepolia"), maxUint256],
+  });
+
+  const ret = await axios.post(
+    `${CIRCLE_KEY}/developer/transactions/contractExecution`,
+    {
+      idempotencyKey: uuidv4(),
+      entitySecretCipherText: getCipherText(),
+      contractAddress: getUSDCContract("sepolia"),
+      callData,
+      walletId: walletMeta.id,
+      feeLevel: "MEDIUM",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+      },
+    },
+  );
+
+  console.log(ret.data);
+
+  res.json({
+    message: "USDC deposited",
+  });
+});
+
+app.get("/getInfo/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  const client = new Redis(
+    `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
+  );
+  const walletMeta = JSON.parse(await client.get(userId));
+  client.disconnect();
+
+  const ret = await axios.get(`${CIRCLE_KEY}/wallets/${walletMeta.id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+    },
+  });
+
+  const balances = await axios.get(
+    `${CIRCLE_KEY}/wallets/${walletMeta.id}/balances?tokenAddress=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+      },
+    },
+  );
+
+  console.log(ret.data);
+  console.log(balances.data.data);
+  const address = ret.data.data.wallet.address;
+
+  res.json({
+    address,
+    balance: balances.data.data.tokenBalances[0].amount,
   });
 });
 

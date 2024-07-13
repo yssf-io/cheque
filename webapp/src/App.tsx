@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { useSearchParams } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount, useWriteContract } from "wagmi";
-import { parseAbi, parseUnits } from "viem";
+import { useAccount, useDisconnect, useWriteContract } from "wagmi";
+import { encodeFunctionData, parseAbi, parseUnits } from "viem";
 
 interface ClaimData {
   to: `0x${string}`;
@@ -15,25 +15,54 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [claimData, setClaimData] = useState<ClaimData | undefined>(undefined);
   const account = useAccount();
-  const { writeContract } = useWriteContract();
+  const { writeContract, error } = useWriteContract();
+  const { disconnect } = useDisconnect();
 
   const handleClaim = () => {
+    console.log("handleClaim");
     if (
       !claimData ||
       !claimData.to ||
       !claimData.signature ||
       !claimData.amount
-    )
+    ) {
+      console.log("not everything is defined");
       return;
+    }
+
+    const encoded = encodeFunctionData({
+      abi: parseAbi([
+        "function claim(uint256 amount, bytes memory signature) external",
+      ]),
+      functionName: "claim",
+      args: [parseUnits(claimData.amount.toString(), 6), claimData.signature],
+    });
+    console.log({ here: encoded });
+
+    console.log("writing tx");
+    console.log(claimData.to);
     writeContract({
       address: claimData.to,
       abi: parseAbi([
-        "function claim(bytes32 signature, uint256 amount) external",
+        "function claim(uint256 amount, bytes memory signature) external",
       ]),
       functionName: "claim",
-      args: [claimData.signature, parseUnits(claimData.amount.toString(), 6)],
+      args: [parseUnits(claimData.amount.toString(), 6), claimData.signature],
     });
   };
+
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+    }
+  }, [error]);
+
+  // useEffect(() => {
+  //   if (account) {
+  //     console.log({ account });
+  //     disconnect();
+  //   }
+  // }, [account]);
 
   useEffect(() => {
     console.log(searchParams);
@@ -67,13 +96,19 @@ function App() {
             </p>
 
             <div className="flex justify-center mt-6">
-              {account ? (
+              {account.address ? (
                 <div>
                   <button
                     onClick={handleClaim}
                     className="border px-6 py-4 bg-blue-400 text-white font-bold rounded-lg"
                   >
                     <p className="text-xl">Claim my {claimData.amount} USDC</p>
+                  </button>
+                  <button
+                    onClick={() => disconnect()}
+                    className="border px-6 py-4 bg-red-400 text-white font-bold rounded-lg"
+                  >
+                    <p className="text-xl">Log out</p>
                   </button>
                 </div>
               ) : (
