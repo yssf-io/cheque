@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import QRCode from "react-native-qrcode-svg";
 
 const API_URL = "http://172.20.10.8:3000";
+const WEBAPP_URL = "http://172.20.10.8:5173";
 
 const getChequeContract = (chain: string): `0x${string}` => {
   switch (chain) {
@@ -43,7 +44,7 @@ export default function TabOneScreen() {
       };
       const encoded = btoa(JSON.stringify(obj, null, 2));
       console.log({ encoded });
-      setSig(encoded); // should become a link to webapp
+      setSig(`${WEBAPP_URL}/claim?data=${encoded}`);
       setLoading(false);
     } catch (error) {
       console.log("error");
@@ -56,6 +57,7 @@ export default function TabOneScreen() {
       {sig ? (
         <View>
           <QRCode value={sig} size={300} />
+          <Text>{sig}</Text>
         </View>
       ) : (
         <View>

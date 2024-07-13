@@ -4,6 +4,7 @@ const axios = require("axios");
 const forge = require("node-forge");
 const { v4: uuidv4 } = require("uuid");
 const Redis = require("ioredis");
+const { parseUnits } = require("viem");
 require("dotenv").config();
 
 const app = express();
@@ -105,7 +106,7 @@ app.get("/generateWallet/:userId", async (req, res) => {
 app.get("/signCheque/:userId/:amount", async (req, res) => {
   console.log("signing cheque...");
   const userId = req.params.userId;
-  const amount = req.params.amount;
+  const amount = parseUnits(req.params.amount, 6);
 
   const client = new Redis(
     `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
@@ -114,7 +115,7 @@ app.get("/signCheque/:userId/:amount", async (req, res) => {
   client.disconnect();
 
   // TODO: make a message that contains the amount (when the smart contract is done)
-  const message = "signing this message hello";
+  const message = `I authorize a claim of ${amount.toString()} USDC`;
 
   const signature = await axios.post(
     `${CIRCLE_KEY}/developer/sign/message`,
