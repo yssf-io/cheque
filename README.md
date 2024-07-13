@@ -12,11 +12,12 @@ transfers the money, he just needs the signature.
 ### Roadmap
 
 - Cheque App
-  - An app that generates a crypto account for you (onboarding screen)
+  - ~~An app that generates a crypto account for you (onboarding screen)~~
+    - ~~Server to manage Circle wallets~~
   - Button to "Create Cheque"
     - Lock money in a smart contract
-    - Sign authorization
-    - Generates QRCode containing the signature (URL-encoded)
+    - ~~Sign authorization~~
+    - ~~Generates QRCode containing the signature (URL-encoded)~~
   - Balance
   - Bonus: onramp
 - Claiming Webapp
