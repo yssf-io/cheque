@@ -102,6 +102,40 @@ app.get("/generateWallet/:userId", async (req, res) => {
   });
 });
 
+app.get("/signCheque/:userId/:amount", async (req, res) => {
+  console.log("signing cheque...");
+  const userId = req.params.userId;
+  const amount = req.params.amount;
+
+  const client = new Redis(
+    `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
+  );
+  const walletMeta = JSON.parse(await client.get(userId));
+  client.disconnect();
+
+  // TODO: make a message that contains the amount (when the smart contract is done)
+  const message = "signing this message hello";
+
+  const signature = await axios.post(
+    `${CIRCLE_KEY}/developer/sign/message`,
+    {
+      walletId: walletMeta.id,
+      entitySecretCipherText: getCipherText(),
+      message,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+      },
+    },
+  );
+
+  res.json({
+    message,
+    signature: signature.data.data.signature,
+  });
+});
+
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
 });
