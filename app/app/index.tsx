@@ -4,15 +4,15 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { v4 as uuidv4 } from "uuid";
-const API_URL = "http://localhost:3000";
+const API_URL = "http://172.20.10.8:3000";
 
 export default function Create() {
   const [loading, setLoading] = useState(false);
 
   const createUser = async () => {
     // do the circle stuff
-    // const userId = uuidv4(); // uncomment for prod
-    const userId = "uuuid"; // using this for testing
+    const userId = uuidv4(); // uncomment for prod
+    // const userId = "uuuid"; // using this for testing
 
     try {
       const res = await axios.get(

@@ -5,6 +5,18 @@ import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import QRCode from "react-native-qrcode-svg";
 
+const API_URL = "http://172.20.10.8:3000";
+
+const getChequeContract = (chain: string): `0x${string}` => {
+  switch (chain) {
+    case "sepolia":
+      return "0x12B85b67bC99aBB893919d1ed3707b1ec7792C20";
+
+    default:
+      return "0x12B85b67bC99aBB893919d1ed3707b1ec7792C20";
+  }
+};
+
 export default function TabOneScreen() {
   const [amount, setAmount] = useState("0");
   const [loading, setLoading] = useState(false);
@@ -20,12 +32,12 @@ export default function TabOneScreen() {
 
     try {
       const { signature } = (
-        await axios.get(`http://localhost:3000/signCheque/${userId}/${amount}`)
+        await axios.get(`${API_URL}/signCheque/${userId}/${amount}`)
       ).data;
       console.log({ signature });
 
       const obj = {
-        to: "0x", // TODO: put the contract address once done
+        to: getChequeContract("sepolia"),
         signature,
         amount,
       };
