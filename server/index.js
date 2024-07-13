@@ -3,6 +3,7 @@ const express = require("express");
 const axios = require("axios");
 const forge = require("node-forge");
 const { v4: uuidv4 } = require("uuid");
+const Redis = require("ioredis");
 require("dotenv").config();
 
 const app = express();
@@ -33,15 +34,16 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.get("/createWalletSet", async (req, res) => {
+app.get("/createWalletSet/:name", async (req, res) => {
   console.log("creating a wallet set...");
+  const name = req.params.name;
 
   const walletSet = await axios.post(
     `${CIRCLE_KEY}/developer/walletSets`,
     {
       idempotencyKey: uuidv4(),
       entitySecretCipherText: getCipherText(),
-      name: "testwallets",
+      name,
     },
     {
       headers: {
@@ -50,10 +52,17 @@ app.get("/createWalletSet", async (req, res) => {
     },
   );
 
-  console.log(walletSet.data);
-  // TODO: store wallet set id somewhere
+  console.log(walletSet.data.data.walletSet.id);
+
+  const client = new Redis(
+    `rediss://default:${process.env.REDIS_SECRET}@solid-whale-50202.upstash.io:6379`,
+  );
+  await client.set(name, walletSet.data.data.walletSet.id);
+  client.disconnect();
+
   res.json({
-    message: "walletset",
+    name,
+    id: walletSet.data.data.walletSet.id,
   });
 });
 
