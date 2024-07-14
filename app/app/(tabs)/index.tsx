@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import QRCode from "react-native-qrcode-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Clipboard from "expo-clipboard";
 
 const API_URL = "http://172.20.10.8:3000";
 const WEBAPP_URL = "http://172.20.10.8:5173";
@@ -118,13 +119,24 @@ export default function TabOneScreen() {
         <Text className="text-5xl text-center my-5">{balance} USDC</Text>
       </View>
       {sig ? (
-        <View>
+        <View className="justify-center items-center">
           <QRCode value={sig} size={300} />
-          <Text>{sig}</Text>
+          <Text
+            className="mt-12 cursor-pointer"
+            onPress={() => Clipboard.setString(sig)}
+          >
+            Copy Link
+          </Text>
+          <Pressable onPress={() => setSig("")}>
+            <View className="px-2 mt-12 py-1 mx-auto bg-red-400 rounded-lg">
+              <Text className="text-white text-lg">Back</Text>
+            </View>
+          </Pressable>
         </View>
       ) : (
         <View>
           <TextInput
+            keyboardType="numeric"
             onChangeText={(e) => setAmount(e)}
             value={amount}
             className="h-8 mx-4 border"
