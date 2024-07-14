@@ -22,6 +22,12 @@ const getChequeContract = (chain) => {
     case "sepolia":
       return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
 
+    case "arbitrum":
+      return "0x12B85b67bC99aBB893919d1ed3707b1ec7792C20";
+
+    case "base":
+      return "0x12B85b67bC99aBB893919d1ed3707b1ec7792C20";
+
     default:
       return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
   }
@@ -31,6 +37,12 @@ const getUSDCContract = (chain) => {
   switch (chain) {
     case "sepolia":
       return "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+
+    case "arbitrum":
+      return "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d";
+
+    case "base":
+      return "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
     default:
       return "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";

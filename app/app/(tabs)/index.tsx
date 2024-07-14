@@ -15,6 +15,12 @@ const getChequeContract = (chain: string): `0x${string}` => {
     case "sepolia":
       return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
 
+    case "arbitrum":
+      return "0x12B85b67bC99aBB893919d1ed3707b1ec7792C20";
+
+    case "base":
+      return "0x12B85b67bC99aBB893919d1ed3707b1ec7792C20";
+
     default:
       return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
   }

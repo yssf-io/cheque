@@ -12,6 +12,8 @@ transfers the money, he just needs the signature.
 ### Deployment
 
 Sepolia -> `0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3`
+Arbitrum Sepolia -> `0x12B85b67bC99aBB893919d1ed3707b1ec7792C20`
+Base Sepolia -> `0x12B85b67bC99aBB893919d1ed3707b1ec7792C20`
 
 ### Roadmap
 

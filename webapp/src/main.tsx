@@ -6,18 +6,13 @@ import "./index.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { arbitrumSepolia, baseSepolia, sepolia } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 const config = getDefaultConfig({
   appName: "Cheque Claiming",
   projectId: "154c55bd97004f4320be91936e2d9fbc",
-  chains: [sepolia],
-  // transports: {
-  //   [sepolia.id]: http(
-  //     "https://eth-sepolia.g.alchemy.com/v2/4HvmaqDcH1O3ZNkHhtFZA5ydU2rgV9Sl",
-  //   ),
-  // },
+  chains: [sepolia, arbitrumSepolia, baseSepolia],
   ssr: false,
 });
 
