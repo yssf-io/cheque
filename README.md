@@ -9,6 +9,10 @@ he wants (just like he would be able to choose whatever bank to cash a check).
 Alice doesn't need to know anything about how Bob will claim the money, she can just authorize the claiming. Bob also doesn't need to care about how Alice
 transfers the money, he just needs the signature.
 
+### Deployment
+
+Sepolia -> `0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3`
+
 ### Roadmap
 
 - Cheque App
@@ -31,65 +35,7 @@ transfers the money, he just needs the signature.
   - ~~`claimUSDC`~~
   - `refund`
 
-Foundry consists of:
+### Roadmap after hackathon
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- Add a nonce to avoid replay attacks
+- Replace signature by zkp (for privacy)

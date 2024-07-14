@@ -4,7 +4,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import * as Crypto from "expo-crypto";
-const API_URL = "http://172.20.10.8:3000";
+
+const API_URL = "https://cheque-797s.onrender.com";
 
 export default function Create() {
   const [loading, setLoading] = useState(false);

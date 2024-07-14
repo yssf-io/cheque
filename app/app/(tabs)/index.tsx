@@ -7,8 +7,8 @@ import QRCode from "react-native-qrcode-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 
-const API_URL = "http://172.20.10.8:3000";
-const WEBAPP_URL = "http://172.20.10.8:5173";
+const API_URL = "https://cheque-797s.onrender.com";
+const WEBAPP_URL = "https://cheque-peach.vercel.app";
 
 const getChequeContract = (chain: string): `0x${string}` => {
   switch (chain) {
