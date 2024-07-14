@@ -42,7 +42,7 @@ function App() {
     console.log("writing tx");
     console.log(claimData.to);
     writeContract({
-      address: claimData.to,
+      address: "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3",
       abi: parseAbi([
         "function claim(uint256 amount, bytes memory signature) external",
       ]),

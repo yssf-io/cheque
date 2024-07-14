@@ -12,10 +12,10 @@ const WEBAPP_URL = "http://172.20.10.8:5173";
 const getChequeContract = (chain: string): `0x${string}` => {
   switch (chain) {
     case "sepolia":
-      return "0xb698239c12CFeB3478979Dbd3a84eAB34D65dE35";
+      return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
 
     default:
-      return "0xb698239c12CFeB3478979Dbd3a84eAB34D65dE35";
+      return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
   }
 };
 
@@ -63,6 +63,7 @@ export default function TabOneScreen() {
         signature,
         amount,
       };
+      console.log({ signature });
       const encoded = btoa(JSON.stringify(obj, null, 2));
       console.log({ encoded });
       setSig(`${WEBAPP_URL}/claim?data=${encoded}`);

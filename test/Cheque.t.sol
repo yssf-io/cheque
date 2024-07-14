@@ -55,7 +55,7 @@ contract ChequeTest is Test {
         cheque.lockUSDC(amount);
 
         // Generate a signature
-        bytes32 messageHash = keccak256(abi.encodePacked("I authorize a claim of ", amount, " USDC"));
+        bytes32 messageHash = keccak256(abi.encodePacked(amount));
         bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPk, ethSignedMessageHash);
 

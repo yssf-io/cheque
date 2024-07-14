@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+
 interface IERC20 {
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function transfer(address recipient, uint256 amount) external returns (bool);
@@ -26,8 +29,7 @@ contract Cheque {
     function claim(uint256 amount, bytes memory signature) external {
         // Verifying the signature
         bytes32 messageHash = getMessageHash(amount);
-        bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
-        address signer = recoverSigner(ethSignedMessageHash, signature);
+        address signer = _getSigner(signature, messageHash);
 
         require(lockedUSDC[signer] > 0, "Invalid signature");
         require(lockedUSDC[signer] >= amount, "Insufficient balance");
@@ -38,25 +40,12 @@ contract Cheque {
         require(usdcToken.transfer(msg.sender, amount), "Transfer failed");
     }
 
+
+    function _getSigner(bytes memory signature, bytes32 msgHash) internal view returns (address) {
+        return ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(msgHash), signature);
+    }
+
     function getMessageHash(uint256 amount) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("I authorize a claim of ", amount, " USDC"));
-    }
-
-    function getEthSignedMessageHash(bytes32 messageHash) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
-    }
-
-    function recoverSigner(bytes32 ethSignedMessageHash, bytes memory signature) internal pure returns (address) {
-        (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
-        return ecrecover(ethSignedMessageHash, v, r, s);
-    }
-
-    function splitSignature(bytes memory sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
-        require(sig.length == 65, "Invalid signature length");
-        assembly {
-            r := mload(add(sig, 32))
-            s := mload(add(sig, 64))
-            v := byte(0, mload(add(sig, 96)))
-        }
+        return keccak256(abi.encodePacked(amount));
     }
 }

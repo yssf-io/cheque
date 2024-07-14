@@ -20,10 +20,10 @@ const CIRCLE_KEY = "https://api.circle.com/v1/w3s";
 const getChequeContract = (chain) => {
   switch (chain) {
     case "sepolia":
-      return "0xb698239c12CFeB3478979Dbd3a84eAB34D65dE35";
+      return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
 
     default:
-      return "0xb698239c12CFeB3478979Dbd3a84eAB34D65dE35";
+      return "0xa8684d7c5450A8eBf9DD6a9B21b810908Ec2EDD3";
   }
 };
 
@@ -148,7 +148,7 @@ app.get("/signCheque/:userId/:amount", async (req, res) => {
     {
       walletId: walletMeta.id,
       entitySecretCipherText: getCipherText(),
-      message,
+      message: amount.toString(),
     },
     {
       headers: {
