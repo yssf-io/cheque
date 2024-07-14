@@ -12,7 +12,7 @@ interface ClaimData {
 }
 
 function App() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _] = useSearchParams();
   const [claimData, setClaimData] = useState<ClaimData | undefined>(undefined);
   const account = useAccount();
   const { writeContract, error } = useWriteContract();
@@ -116,12 +116,6 @@ function App() {
               )}
             </div>
           </div>
-
-          <p className="text-lg mt-12 text-left">
-            If you want to construct your own transaction
-          </p>
-
-          <p className="mt-6">In construction...</p>
         </div>
       )}
     </div>
